@@ -25,9 +25,15 @@ SECRET_KEY = "django-insecure-ut8yl+ff()ayo(%@rsr%fdv$$2=e#gept)8s-we_27hxhxeiz$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "effective-chainsaw-9jw69w69p55hxxq-8002.app.github.dev",
+]
 
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = [
+    "localhost",
+    "effective-chainsaw-9jw69w69p55hxxq-8002.app.github.dev",
+]
 
 
 # Application definition
