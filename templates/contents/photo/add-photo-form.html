@@ -1,0 +1,93 @@
+<form action="{% url 'inventory_app:add_photo' %}" method="post" class="add_photo_form" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Photo Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="mb-3">
+      <label class="form-label" for="item">Item</label>
+      <select class="form-control" name="item" id="item-select" required>
+        <option value="" disabled selected>Select Item</option>
+        {% for item in items %}
+          <option value="{{ item.id }}">{{ item.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="photo">Upload Photos</label>
+      <!-- Existing Image Preview Area -->
+      <div id="existing-photo-preview-container"></div>
+      <!-- Uploaded Image Preview Area -->
+      <div id="photo-preview-container">
+        <div id="photo-previews"></div>
+      </div>
+      <input class="form-control" name="photo" id="photos" type="file" accept="image/*" multiple />
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+
+<script>
+  document.getElementById('photos').addEventListener('change', function (event) {
+    const files = event.target.files
+    const previewContainer = document.getElementById('photo-preview-container')
+  
+    const previewDiv = document.getElementById('photo-previews')
+    previewDiv.innerHTML = '' // Clear previous previews
+  
+    const div = document.createElement('div')
+    div.innerHTML = '<small>Newly Uploaded Image</small>'
+    previewDiv.appendChild(div)
+  
+    if (files.length > 0) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader()
+        reader.onload = function (e) {
+          const img = document.createElement('img')
+          img.src = e.target.result
+          img.style.maxWidth = '25%'
+          img.style.height = 'auto'
+          img.style.marginBottom = '10px'
+          img.style.marginRight = '5px'
+          previewDiv.appendChild(img)
+        }
+        reader.readAsDataURL(file)
+      })
+      previewContainer.style.display = 'block'
+    } else {
+      previewContainer.style.display = 'none'
+    }
+  })
+  
+  document.getElementById('item-select').addEventListener('change', function () {
+    const itemId = this.value
+    fetch(`/get_item_photos/?item_id=${itemId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const existingPhotoContainer = document.getElementById('existing-photo-preview-container')
+        existingPhotoContainer.innerHTML = '' // Clear previous images
+  
+        const div = document.createElement('div')
+        div.innerHTML = '<small>Previously Uploaded Images</small>'
+        existingPhotoContainer.appendChild(div)
+  
+        data.photos.forEach((photo) => {
+          const img = document.createElement('img')
+          img.src = photo.url
+          img.style.maxWidth = '25%'
+          img.style.height = 'auto'
+          img.style.marginBottom = '10px'
+          img.style.marginRight = '5px'
+          existingPhotoContainer.appendChild(img)
+        })
+      })
+  })
+</script>

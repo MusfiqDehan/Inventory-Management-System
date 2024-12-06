@@ -1,0 +1,37 @@
+<form action="{% url 'inventory_app:update_photo' single_photo.id %}" method="post" class="update_photo_form" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Photo Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="item">Item</label>
+        <select class="form-control" name="item" id="item" required>
+            <option value="" disabled>Select Item</option>
+            {% for item in items %}
+                <option value="{{ item.id }}" {% if item.id == single_stock.item.id %}selected{% endif %}>
+                    {{ item.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Upload Photo</label>
+        {% if single_photo.photo %}
+          <div>
+            <img src="{{ single_photo.photo.url }}" alt="Current photo" style="max-width: 25%; height: auto;" />
+            <small>{{ single_photo.photo.url }}</small>
+          </div>
+        {% endif %}
+        <input type="file" name="photo" class="form-control" id="exampleFormControlInput1" />
+      </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>

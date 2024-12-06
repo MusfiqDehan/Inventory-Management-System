@@ -1,0 +1,24 @@
+{% for warehouse in warehouses %}
+  <tr>
+    <td class="align-middle ps-3 name">
+      <input type="checkbox" name="" id="" />
+    </td>
+    <td class="align-middle ps-3 name">{{ forloop.counter }}</td>
+    <td class="align-middle ps-3 name">{{ warehouse.name }}</td>
+    <td class="align-middle ps-3 name">{{ warehouse.warehouse_type }}</td>
+    <td class="align-middle email">{{ warehouse.location_id }}</td>
+    <td class="align-middle age">{{ warehouse.address }}</td>
+    <td class="align-middle white-space-nowrap text-end pe-0">
+      <div class="btn-reveal-trigger position-static">
+        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h fs-10"></span></button>
+
+        <div class="dropdown-menu dropdown-menu-end py-2">
+          <a class="dropdown-item" href="#!">View</a>
+          <a class="dropdown-item update_warehouse_button" href="{% url 'inventory_app:update_warehouse' warehouse.id %}">Edit</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger delete_warehouse_button" href="{% url 'inventory_app:delete_warehouse' warehouse.id %}">Remove</a>
+        </div>
+      </div>
+    </td>
+  </tr>
+{% endfor %}

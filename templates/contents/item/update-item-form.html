@@ -1,0 +1,216 @@
+<form action="{% url 'inventory_app:update_item' single_item.id %}" method="post" class="update_item_form" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Item Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <!-- Left Column: Item details -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label class="form-label" for="name">Name</label>
+          <input class="form-control" name="name" value="{{ single_item.name }}" id="name" type="text" placeholder="Item Name" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-control" name="description" id="description" rows="3" placeholder="Item Description" required>{{ single_item.description }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warehouse">Warehouse</label>
+          <select class="form-control" name="warehouse" id="warehouse" required>
+            <option value="" disabled>Select Warehouse</option>
+            {% for warehouse in warehouses %}
+              <option value="{{ warehouse.id }}" {% if warehouse.id == single_item.warehouse.id %}selected{% endif %}>{{ warehouse.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-control" name="category" id="category" required>
+            <option value="" disabled>Select Category</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if category.id == single_item.category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="unit">Unit</label>
+          <select class="form-control" name="unit" id="unit" required>
+            <option value="" disabled>Select Unit</option>
+            {% for unit in units %}
+              <option value="{{ unit.id }}" {% if unit.id == single_item.unit.id %}selected{% endif %}>{{ unit.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="price_per_unit">Price Per Unit</label>
+          <input class="form-control" name="price_per_unit" value="{{ single_item.price_per_unit }}" id="price_per_unit" type="number" step="0.01" placeholder="Price Per Unit" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="random_unique_id">Unique ID</label>
+          <input class="form-control" name="random_unique_id" value="{{ single_item.random_unique_id }}" id="random_unique_id" type="text" placeholder="Unique ID" readonly />
+        </div>
+      </div>
+
+      <!-- Middle Column: Photo Upload Section -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label class="form-label" for="photos">Upload Photos</label>
+          <div id="existing-photo-preview-container">
+            {% for photo in photos %}
+              <div style="display: inline-block; position: relative; margin: 5px;">
+                <img src="{{ photo.photo.url }}" style="max-width: 100px; height: auto;" />
+                <span class="remove-photo" data-photo-id="{{ photo.id }}" style="position: absolute; top: 0; right: 0; cursor: pointer; background-color: rgba(255, 255, 255, 0.7); padding: 2px 5px; border-radius: 50%;">&times;</span>
+              </div>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="deleted_photos" id="deleted_photos" value="">
+          <div id="photo-preview-container" style="width: 100%;">
+            <div id="photo-previews"></div>
+          </div>
+          <div id="drop-area" style="border: 2px dashed #ccc; padding: 20px; text-align: center; cursor: pointer; margin-top: 10px;">
+            <input class="form-control" name="photos" id="photos" type="file" accept="image/*" multiple />
+            <p style="margin: 0;">Drag and drop photos here or click to upload</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Stock details -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label class="form-label" for="quantity">Quantity</label>
+          <input class="form-control" name="quantity" value="{{ single_item.stock.quantity }}" id="quantity" type="number" step="1" placeholder="Quantity" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="last_quantity_added">Last Quantity Added</label>
+          <input class="form-control" name="last_quantity_added" value="{{ single_item.stock.last_quantity_added }}" id="last_quantity_added" type="number" step="1" placeholder="Last Quantity Added" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="last_quantity_reduced">Last Quantity Reduced</label>
+          <input class="form-control" name="last_quantity_reduced" value="{{ single_item.stock.last_quantity_reduced }}" id="last_quantity_reduced" type="number" step="1" placeholder="Last Quantity Reduced" required />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+
+<script>
+$(document).ready(function () {
+  let uploadedFiles = [];
+  let deletedPhotoIds = [];
+
+  $('#photos').on('change', handleFileSelect);
+
+  function handleFileSelect(event) {
+    const files = event.target.files;
+    uploadedFiles = uploadedFiles.concat(Array.from(files));
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const previewContainer = $('#photo-preview-container');
+    const previewDiv = $('#photo-previews');
+    previewDiv.empty(); // Clear previous previews
+
+    uploadedFiles.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imgWrapper = $('<div></div>').css({
+          position: 'relative',
+          display: 'inline-block',
+          margin: '5px'
+        });
+
+        const img = $('<img>').attr('src', e.target.result).css({
+          maxWidth: '100px',
+          height: 'auto'
+        });
+
+        const removeButton = $('<span>&times;</span>').css({
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          color: 'white',
+          fontSize: '50px',
+          lineHeight: '35px',
+          cursor: 'pointer'
+        }).click(function () {
+          removeFile(index);
+        });
+
+        imgWrapper.append(img).append(removeButton);
+        previewDiv.append(imgWrapper);
+      };
+      reader.readAsDataURL(file);
+    });
+    previewContainer.show();
+  }
+
+  function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    updateFileList();
+    updatePreview();
+  }
+
+  function updateFileList() {
+    const dataTransfer = new DataTransfer();
+    uploadedFiles.forEach(file => {
+      dataTransfer.items.add(file);
+    });
+    $('#photos')[0].files = dataTransfer.files;
+  }
+
+  const dropArea = $('#drop-area');
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.on(eventName, preventDefaults);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  dropArea.on('drop', handleDrop);
+
+  function handleDrop(e) {
+    const dt = e.originalEvent.dataTransfer;
+    const files = dt.files;
+    uploadedFiles = uploadedFiles.concat(Array.from(files));
+    updateFileList();
+    updatePreview();
+  }
+
+  // Handle removal of existing photos
+  $('.remove-photo').click(function () {
+    const photoId = $(this).data('photo-id');
+    deletedPhotoIds.push(photoId);
+    $('#deleted_photos').val(deletedPhotoIds.join(','));
+    $(this).parent().remove();
+  });
+
+  // AJAX for fetching units based on selected category
+  $('#category').on('change', function () {
+    const categoryId = $(this).val();
+    const unitSelect = $('#unit');
+    unitSelect.html('<option value="" disabled selected>Loading...</option>');
+
+    $.ajax({
+      url: `/get-units/?category_id=${categoryId}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        unitSelect.html('<option value="" disabled selected>Select Unit</option>');
+        data.forEach(unit => {
+          unitSelect.append(`<option value="${unit.id}">${unit.name}</option>`);
+        });
+      }
+    });
+  });
+});
+</script>

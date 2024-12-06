@@ -1,0 +1,19 @@
+<form action="{% url 'inventory_app:delete_stock' single_stock.id %}" method="post" class="delete_stock_form">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h4 class="modal-title" id="exampleModalLabel">Confirmation of Delete Stock</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  <div class="modal-body">
+    <h6>
+      Are you sure you want to delete the stock of <strong>{{ single_stock.item }}</strong>
+      from <strong>{{ single_stock.warehouse }}</strong> ?
+    </h6>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </div>
+</form>

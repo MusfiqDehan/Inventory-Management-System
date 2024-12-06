@@ -1,0 +1,22 @@
+{% for item_category in item_categories %}
+  <tr>
+    <td class="align-middle ps-3 name">
+      <input type="checkbox" name="" id="" />
+    </td>
+    <td class="align-middle ps-3 name">{{ forloop.counter }}</td>
+    <td class="align-middle ps-3 name">{{ item_category.name }}</td>
+    <td class="align-middle ps-3 name">{{ item_category.description }}</td>
+    <td class="align-middle white-space-nowrap text-end pe-0">
+      <div class="btn-reveal-trigger position-static">
+        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h fs-10"></span></button>
+
+        <div class="dropdown-menu dropdown-menu-end py-2">
+          <a class="dropdown-item" href="#!">View</a>
+          <a class="dropdown-item update_item_category_button" href="{% url 'inventory_app:update_item_category' item_category.id %}">Edit</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger delete_item_category_button" href="{% url 'inventory_app:delete_item_category' item_category.id %}">Remove</a>
+        </div>
+      </div>
+    </td>
+  </tr>
+{% endfor %}

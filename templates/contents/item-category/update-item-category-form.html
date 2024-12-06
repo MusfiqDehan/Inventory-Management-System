@@ -1,0 +1,22 @@
+<form action="{% url 'inventory_app:update_item_category' single_item_category.id %}" method="post" class="update_item_category_form">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Item Category</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <label class="form-label" for="exampleFormControlInput">Item Category Name</label>
+      <input class="form-control" name="name" value="{{ single_item_category.name }}" id="exampleFormControlInput" type="text" placeholder="Item Category Name" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="exampleFormControlInput">Item Category Description</label>
+      <input class="form-control" name="description" value="{{ single_item_category.description }}" id="exampleFormControlInput" type="text" placeholder="Item Category Type" />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>

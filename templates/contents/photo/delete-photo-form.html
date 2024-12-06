@@ -1,0 +1,16 @@
+<form action="{% url 'inventory_app:delete_photo' single_photo.id %}" method="post" class="delete_photo_form">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Confirmation of Delete Photo</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  <div class="modal-body">
+    <h6>Are you sure you want to delete the photo of "{{ single_photo.item }}"?</h6>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </div>
+</form>

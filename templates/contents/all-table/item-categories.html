@@ -1,0 +1,279 @@
+{% extends '../../base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="alert-box-container">
+
+</div>
+
+<div class="table-container">
+
+    <ol class="breadcrumb bg-transparent ml-3">
+        <li class="breadcrumb-item">
+            <a href="#">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">Inventory</a>
+        </li>
+        <li class="breadcrumb-item active text-black-50">{{ table_name }}</li>
+    </ol>
+
+
+    <div id="itemCategoryCreate">
+        <button data-url="{% url 'inventory_app:add_item_category' %}" type="button"
+            class="btn btn-primary mb-3 add_item_category_button">
+            Add Item Category
+        </button>
+    </div>
+
+
+
+    <div class="modal fade" id="itemCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="tableExample"
+        data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;item_category_type&quot;,&quot;location_id&quot;,&quot;address&quot;],&quot;page&quot;:5,&quot;pagination&quot;:true}"
+        class="bg-white px-3 pb-3">
+
+        <div class="table-responsive">
+            <table class="table table-sm fs-9 mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-top border-translucent ps-3">
+                            <input type="checkbox" name="" id="">
+                        </th>
+                        <th class="border-top border-translucent ps-3">#</th>
+                        <th class="sort border-top border-translucent ps-3" data-sort="name">Name</th>
+                        <th class="sort border-top border-translucent" data-sort="item_category_type">Description</th>
+                        <th class="sort text-end align-middle pe-0 border-top border-translucent" scope="col">ACTION
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="itemCategoryList">
+                    {% include '../item-category/item-category-list.html' %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex flex-between-center pt-3">
+            <div class="pagination d-none">
+                <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
+                <li><button class="page" type="button" data-i="2" data-page="5">2</button></li>
+                <li><button class="page" type="button" data-i="3" data-page="5">3</button></li>
+                <li class="disabled"><button class="page" type="button">...</button></li>
+            </div>
+            <p class="mb-0 fs-9">
+                <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 5 <span
+                        class="text-body-tertiary"> Items of </span>43</span>
+                <span class="d-none d-sm-inline-block"> — </span>
+                <a class="fw-semibold" href="#!" data-list-view="*">
+                    View all
+                    <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span>
+                </a><a class="fw-semibold d-none" href="#!" data-list-view="less">
+                    View Less
+                    <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span>
+                </a>
+            </p>
+            <div class="d-flex">
+                <button class="btn btn-sm btn-primary disabled" type="button" data-list-pagination="prev"
+                    disabled=""><span>Previous</span></button>
+                <button class="btn btn-sm btn-primary px-4 ms-2" type="button"
+                    data-list-pagination="next"><span>Next</span></button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Load form data
+        var loadForm = function () {
+            console.log('Load')
+            var modal = document.getElementById('itemCategoryModal')
+            var button = $(this)
+
+            $.ajax({
+                url: button.attr('data-url'),
+                type: 'get',
+                dataType: 'json',
+
+                beforeSend: function () {
+                    console.log('Before')
+                    $(modal).modal('show')
+                },
+
+                success: function (data) {
+                    $('#itemCategoryModal .modal-content').html(data.add_item_category_form)
+                }
+            })
+        }
+
+        // Save form data
+        var saveForm = function () {
+            var modal = document.getElementById('itemCategoryModal')
+            var form = $(this)
+            var formData = new FormData(form[0])
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                dataType: 'json',
+                data: formData,
+
+                processData: false,
+                contentType: false,
+
+                beforeSend: function (xhr) {
+                    console.log("Load before Save")
+                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}')
+                },
+
+                success: function (data) {
+                    if (data.valid) {
+                        $(modal).modal('hide')
+                        // Correctly update the table content
+                        $('#itemCategoryList').html(data.item_category_list)
+                        $('.content .alert-box-container').html(data.alert_box)
+                    }
+                }
+            })
+            return false
+        }
+
+        // For object creation
+        $('#itemCategoryCreate').on('click', '.add_item_category_button', loadForm)
+        $('#itemCategoryModal').on('submit', '.add_item_category_form', saveForm)
+    })
+</script>
+
+<script>
+    $(function () {
+        // Load form data
+        var loadEditForm = function (event) {
+            event.preventDefault();
+            var modal = $('#itemCategoryModal');
+            var editButton = $(this);
+
+            $.ajax({
+                url: editButton.attr('href'),
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    modal.modal('show');
+                },
+                success: function (data) {
+                    modal.find('.modal-content').html(data.update_item_category_form);
+                }
+            });
+        }
+
+        // Save form data
+        var saveEditForm = function (event) {
+            event.preventDefault();
+            var modal = $('#itemCategoryModal');
+            var form = $(this);
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                dataType: 'json',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+                },
+                success: function (data) {
+                    if (data.valid) {
+                        modal.modal('hide');
+                        $('#itemCategoryList').html(data.item_category_list);
+                        $('.content .alert-box-container').html(data.alert_box);
+                    } else {
+                        modal.find('.modal-content').html(data.update_item_category_form);
+                    }
+                }
+            });
+        }
+
+        // For object edit
+        $('#itemCategoryList').on('click', '.update_item_category_button', loadEditForm);
+        $('#itemCategoryModal').on('submit', '.update_item_category_form', saveEditForm);
+    });
+</script>
+
+<script>
+    $(function () {
+        // Load form data
+        var loadDeleteForm = function (event) {
+            event.preventDefault();
+            var modal = $('#itemCategoryModal');
+            var deleteButton = $(this);
+
+            $.ajax({
+                url: deleteButton.attr('href'),
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    modal.modal('show');
+                },
+                success: function (data) {
+                    modal.find('.modal-content').html(data.delete_item_category_form);
+                }
+            });
+        }
+
+        // Save form data
+        var saveDeleteForm = function (event) {
+            event.preventDefault();
+            var modal = $('#itemCategoryModal');
+            var form = $(this);
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                dataType: 'json',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+                },
+                success: function (data) {
+                    if (data.valid) {
+                        modal.modal('hide');
+                        $('#itemCategoryList').html(data.item_category_list);
+                        $('.alert-box-container').html(data.alert_box);
+                    } else {
+                        modal.find('.modal-content').html(data.delete_item_category_form);
+                    }
+                }
+            });
+        }
+
+        // For object delete
+        $('#itemCategoryList').on('click', '.delete_item_category_button', loadDeleteForm);
+        $('#itemCategoryModal').on('submit', '.delete_item_category_form', saveDeleteForm);
+    });
+</script>
+
+
+
+
+{% endblock %}

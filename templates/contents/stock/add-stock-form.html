@@ -1,0 +1,48 @@
+<form action="{% url 'inventory_app:add_stock' %}" method="post" class="add_stock_form">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Stock Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <label class="form-label" for="item">Item</label>
+      <select class="form-control" name="item" id="warehouse" required>
+        <option value="" disabled selected>Select Item</option>
+        {% for item in items %}
+          <option value="{{ item.id }}">{{ item.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="warehouse">Warehouse</label>
+      <select class="form-control" name="warehouse" id="warehouse" required>
+        <option value="" disabled selected>Select Warehouse</option>
+        {% for warehouse in warehouses %}
+          <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="quantity">Quantity</label>
+      <input class="form-control" name="quantity" id="quantity" type="number" step="1" placeholder="Quantity" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="last_quantity_added">Last Quantity Added</label>
+      <input class="form-control" name="last_quantity_added" id="last_quantity_added" type="number" step="1" placeholder="Last Quantity Added" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="last_quantity_reduced">Last Quantity Reduced</label>
+      <input class="form-control" name="last_quantity_reduced" id="last_quantity_reduced" type="number" step="1" placeholder="Last Quantity Reduced" required />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>

@@ -1,0 +1,276 @@
+{% load static %}
+
+<form action="{% url 'inventory_app:add_item' %}" method="post" class="add_item_form" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Item Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+
+      <!-- Left Column: Item details -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label class="form-label" for="name">Name</label>
+          <input class="form-control" name="name" id="name" type="text" placeholder="Item Name" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-control" name="description" id="description" rows="3" placeholder="Item Description"
+            required></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warehouse">Warehouse</label>
+          <select class="form-control" name="warehouse" id="warehouse" required>
+            <option value="" disabled selected>Select Warehouse</option>
+            {% for warehouse in warehouses %}
+            <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-control" name="category" id="category" required>
+            <option value="" disabled selected>Select Category</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+
+        <!-- Code type selection -->
+        <div class="mb-3">
+          <label class="form-label">Which type of code you want for your item?</label><br>
+          <input type="checkbox" id="barcode" name="barcode" value="1">
+          <label for="barcode">BarCode</label><br>
+          <input type="checkbox" id="qrcode" name="qrcode" value="1">
+          <label for="qrcode">QRCode</label><br>
+          <input type="checkbox" id="isbn_checkbox" name="isbn_checkbox" value="1"
+            onchange="toggleInputField('isbn', this)">
+          <label for="isbn_checkbox">ISBN</label><br>
+          <input type="checkbox" id="serial_no_checkbox" name="serial_no_checkbox" value="1"
+            onchange="toggleInputField('serial_no', this)">
+          <label for="serial_no_checkbox">Serial No</label><br>
+        </div>
+
+        <!-- ISBN and Serial No input fields -->
+        <div class="mb-3" id="isbn_input" style="display:none;">
+          <label class="form-label" for="isbn">ISBN</label>
+          <input class="form-control" name="isbn" id="isbn" type="text" placeholder="ISBN" />
+        </div>
+        <div class="mb-3" id="serial_no_input" style="display:none;">
+          <label class="form-label" for="serial_no">Serial No</label>
+          <input class="form-control" name="serial_no" id="serial_no" type="text" placeholder="Serial No" />
+        </div>
+
+
+        <div class="mb-3">
+          <label class="form-label" for="unit">Unit</label>
+          <select class="form-control" name="unit" id="unit" required>
+            <option value="" disabled selected>Select Unit</option>
+            {% for unit in units %}
+            <option value="{{ unit.id }}">{{ unit.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="price_per_unit">Price Per Unit</label>
+          <input class="form-control" name="price_per_unit" id="price_per_unit" type="number" step="0.01"
+            placeholder="Price Per Unit" required />
+        </div>
+
+        <div class="mb-3" style="display: none;">
+          <label class="form-label" for="random_unique_id">Unique ID</label>
+          <input class="form-control" name="random_unique_id" id="random_unique_id" type="text" placeholder="Unique ID"
+            value="{{ random_unique_id }}" readonly />
+        </div>
+      </div>
+
+      <!-- Middle Column: Photo Upload Section -->
+
+      <div id="photo-upload" class="col-md-4" style="border: 2px dashed #ccc;">
+
+        <div class="mb-3">
+          <label class="form-label" for="photos">Upload Photos</label>
+
+
+          <!-- Input field should keep outside drop area to click on full drop area  -->
+
+          <input class="form-control" name="photos" id="photos" type="file" accept="image/*" multiple
+            style="display: none;" />
+
+          <div id="drop-area"
+            style="border: 1px dashed #ccc; padding: 25px; text-align: center; cursor: pointer; margin-top: 10px;">
+
+            <img src="{% static 'inventory_app/assets/img/icons/cloud-upload.svg' %}" width="15%" alt="">
+            <p id="upload-text-new" style="margin: 0;">Drag and drop photos here or click to upload</p>
+            <p id="upload-text" style="color: blue; text-decoration: underline; cursor: pointer;">
+              Upload from device
+            </p>
+
+          </div>
+
+
+          <div style="margin-top: 10px;" id="existing-photo-preview-container"></div>
+          <div id="photo-preview-container" style="width: 100%;">
+            <div id="photo-previews"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Right Column: Stock details -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label class="form-label" for="quantity">Quantity</label>
+          <input class="form-control" name="quantity" id="quantity" type="number" step="1" placeholder="Quantity"
+            required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="last_quantity_added">Last Quantity Added</label>
+          <input class="form-control" name="last_quantity_added" id="last_quantity_added" type="number" step="1"
+            placeholder="Last Quantity Added" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="last_quantity_reduced">Last Quantity Reduced</label>
+          <input class="form-control" name="last_quantity_reduced" id="last_quantity_reduced" type="number" step="1"
+            placeholder="Last Quantity Reduced" required />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+
+
+<script>
+  function toggleInputField(fieldId, checkbox) {
+    var inputField = document.getElementById(fieldId + '_input');
+    if (checkbox.checked) {
+      inputField.style.display = 'block';
+    } else {
+      inputField.style.display = 'none';
+    }
+  }
+</script>
+
+<script>
+  $(document).ready(function () {
+    let uploadedFiles = [];
+
+    $('#photos').on('change', handleFileSelect);
+
+
+    $('#drop-area').on('click', function () {
+      console.log("Drop Area Clicked")
+      $('#photos').click();
+    });
+
+
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      uploadedFiles = uploadedFiles.concat(Array.from(files));
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const previewContainer = $('#photo-preview-container');
+      const previewDiv = $('#photo-previews');
+      previewDiv.empty(); // Clear previous previews
+
+      uploadedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imgWrapper = $('<div></div>').css({
+            position: 'relative',
+            display: 'inline-block',
+            margin: '5px'
+          });
+
+          const img = $('<img>').attr('src', e.target.result).css({
+            maxWidth: '100px',
+            height: 'auto'
+          });
+
+          const removeButton = $('<span>&times;</span>').css({
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            color: 'white',
+            fontSize: '30px',
+            lineHeight: '20px',
+            cursor: 'pointer',
+            padding: '4px'
+          }).on('click', function () {
+            removeFile(index);
+          });
+
+          imgWrapper.append(img).append(removeButton);
+          previewDiv.append(imgWrapper);
+        };
+        reader.readAsDataURL(file);
+      });
+      previewContainer.show();
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      updateFileList();
+      updatePreview();
+    }
+
+    function updateFileList() {
+      const dataTransfer = new DataTransfer();
+      uploadedFiles.forEach(file => {
+        dataTransfer.items.add(file);
+      });
+      $('#photos')[0].files = dataTransfer.files;
+    }
+
+    const dropArea = $('#drop-area');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.on(eventName, preventDefaults);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    dropArea.on('drop', handleDrop);
+
+    function handleDrop(e) {
+      const dt = e.originalEvent.dataTransfer;
+      const files = dt.files;
+      uploadedFiles = uploadedFiles.concat(Array.from(files));
+      updateFileList();
+      updatePreview();
+    }
+
+    // AJAX for fetching units based on selected category
+    $('#category').on('change', function () {
+      const categoryId = $(this).val();
+      const unitSelect = $('#unit');
+      unitSelect.html('<option value="" disabled selected>Loading...</option>');
+
+      $.ajax({
+        url: `/get-units/?category_id=${categoryId}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          unitSelect.html('<option value="" disabled selected>Select Unit</option>');
+          data.forEach(unit => {
+            unitSelect.append(`<option value="${unit.id}">${unit.name}</option>`);
+          });
+        }
+      });
+    });
+  });
+</script>

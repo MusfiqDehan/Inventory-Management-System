@@ -1,0 +1,32 @@
+<form action="{% url 'inventory_app:add_warehouse' %}" method="post" class="add_warehouse_form">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Warehouse Form</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <label class="form-label" for="exampleFormControlInput">Warehouse Name</label>
+      <input class="form-control" name="name" id="exampleFormControlInput" type="text" placeholder="Warehouse Name" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="exampleFormControlInput">Warehouse Type</label>
+      <input class="form-control" name="warehouse_type" id="exampleFormControlInput" type="text" placeholder="Warehouse Type" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="exampleFormControlInput">Warhouse Location ID</label>
+      <input class="form-control" name="location_id" id="exampleFormControlInput" type="text" placeholder="Warhouse Location ID" />
+    </div>
+
+    <div class="mb-0">
+      <label class="form-label" for="exampleTextarea">Warehouse Address</label>
+      <textarea class="form-control" name="address" id="exampleTextarea" rows="3" placeholder="Warehouse Address"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
