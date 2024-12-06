@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://effective-chainsaw-9jw69w69p55hxxq-8002.app.github.dev",
+    "https://localhost:8002",
 ]
 
 
